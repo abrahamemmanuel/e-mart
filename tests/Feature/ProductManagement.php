@@ -17,10 +17,48 @@ class ProductManagementTest extends TestCase
         $this->withoutExceptionHandling();
         $response = $this->post('/products', $this->data());
 
-        $product = Product::first();
-
         $this->assertCount(1, Product::all());
         $response->assertStatus(201);
+    }
+
+    /** @test */
+    public function a_product_can_be_updated()
+    {
+        $this->withoutExceptionHandling();
+        $this->post('/products', $this->data());
+
+        $product = Product::first();
+
+        $response = $this->patch('/products/' . $product->id, [
+            'name' => 'Samsung Galaxy',
+            'description' => 'New phone',
+            'price' => 100,
+            'stock' => 5,
+            'discount' => 5,
+        ]);
+
+        $this->assertEquals('Samsung Galaxy', Product::first()->name);
+        $this->assertEquals('New phone', Product::first()->description);
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function a_product_can_be_deleted()
+    {
+        $this->post('/products', $this->data());
+
+        $product = Product::first();
+
+        $response = $this->delete('/products/' . $product->id);
+
+        $this->assertCount(0, Product::all());
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function view_a_single_product()
+    {
+       
     }
 
     /** @test */
@@ -67,7 +105,6 @@ class ProductManagementTest extends TestCase
         $response->assertSessionHasErrors('stock');
     }
 
-   
     private function data()
     {
         return [
@@ -79,4 +116,3 @@ class ProductManagementTest extends TestCase
         ];
     }
 }
-    

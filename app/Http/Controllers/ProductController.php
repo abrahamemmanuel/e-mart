@@ -28,13 +28,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $this->validateRequest();
-        $product = Product::create([
-          'name' => request('name'),
-          'description' => request('description'),
-          'price' => (int)request('price'),
-          'stock' => (int)request('stock'),
-          'discount' => request('discount') !== null ? (int)request('discount') : null
-        ]);
+        $product = Product::create($this->data());
 
         // save product to database
         $product->save();
@@ -65,7 +59,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        $product->update($this->data());
+
+        return response(['data' => new ProductResource($product)], Response::HTTP_OK);
     }
 
     /**
@@ -76,7 +72,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return response(['message' => 'Product deleted'], Response::HTTP_OK);
     }
 
     public function validateRequest()
@@ -86,8 +84,19 @@ class ProductController extends Controller
             'description' => 'required',
             'price' => 'required|integer',
             'stock' => 'required|integer',
-            'discount' => 'nullable|integer'
+            'discount' => 'nullable|integer',
         ]);
 
+    }
+
+    public function data()
+    {
+        return [
+            'name' => request('name'),
+            'description' => request('description'),
+            'price' => (int) request('price'),
+            'stock' => (int) request('stock'),
+            'discount' => request('discount') !== null ? (int) request('discount') : null,
+        ];
     }
 }
