@@ -56,9 +56,24 @@ class ProductManagementTest extends TestCase
     }
 
     /** @test */
+    public function view_all_products()
+    {
+       $products = factory(Product::class, 10)->create();
+
+       $response = $this->get('/products');
+
+       $this->assertCount(10, Product::all());
+       $response->assertStatus(200);
+    }
+
+        /** @test */
     public function view_a_single_product()
     {
-       
+       factory(Product::class, 10)->create();
+
+       $response = $this->get('/products/' . Product::first()->id);
+
+       $response->assertStatus(200);
     }
 
     /** @test */
